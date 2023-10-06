@@ -6,4 +6,4 @@
 
 This example repository contains a Payload application to demonstrate connecting to a MongoDB® database on Atlas.
 
-Follow our guide here, or click here to deploy a combined service + secret group. Simply provide your MongoDB connection string.
+[Follow our guide here](https://northflank.com/docs/v1/application/databases-and-persistence/integrate-with-a-database-provider/integrate-mongo-atlas-with-northflank).
