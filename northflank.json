@@ -1,0 +1,114 @@
+{
+  "apiVersion": "v1",
+  "spec": {
+    "kind": "Workflow",
+    "spec": {
+      "type": "sequential",
+      "steps": [
+        {
+          "kind": "SecretGroup",
+          "spec": {
+            "name": "Payload secrets",
+            "secretType": "environment-arguments",
+            "priority": 10,
+            "secrets": {
+              "variables": {
+                "PAYLOAD_SECRET": "${args.PAYLOAD_SECRET}",
+                "MONGODB_URI": "${args.ATLAS_CONNECTION_STRING}"
+              }
+            },
+            "restrictions": {
+              "restricted": false,
+              "nfObjects": [],
+              "tags": []
+            }
+          }
+        },
+        {
+          "kind": "CombinedService",
+          "spec": {
+            "name": "Payload application",
+            "billing": {
+              "deploymentPlan": "nf-compute-10"
+            },
+            "deployment": {
+              "instances": 1,
+              "docker": {
+                "configType": "customCommand",
+                "customCommand": "yarn serve"
+              },
+              "buildpack": {
+                "configType": "default"
+              },
+              "storage": {
+                "ephemeralStorage": {
+                  "storageSize": 1024
+                }
+              }
+            },
+            "ports": [
+              {
+                "name": "admin",
+                "internalPort": 3000,
+                "public": true,
+                "protocol": "HTTP",
+                "security": {
+                  "credentials": [],
+                  "policies": []
+                },
+                "domains": [],
+                "disableNfDomain": false
+              }
+            ],
+            "vcsData": {
+              "projectUrl": "https://github.com/northflank-guides/deploy-payload-on-northflank",
+              "projectType": "github",
+              "projectBranch": "master"
+            },
+            "buildSettings": {
+              "dockerfile": {
+                "buildEngine": "kaniko",
+                "dockerFilePath": "/Dockerfile",
+                "dockerWorkDir": "/"
+              }
+            },
+            "buildConfiguration": {
+              "ciIgnoreFlags": [
+                "[skip ci]",
+                "[ci skip]",
+                "[no ci]",
+                "[skip nf]",
+                "[nf skip]",
+                "[northflank skip]",
+                "[skip northflank]"
+              ],
+              "ciIgnoreFlagsEnabled": false,
+              "isAllowList": false
+            },
+            "disabledCI": false,
+            "runtimeEnvironment": {},
+            "buildArguments": {}
+          }
+        }
+      ]
+    }
+  },
+  "name": "Atlas integration example",
+  "description": "Demonstration integration of an Atlas MongoDB database with a Payload application on Northflank",
+  "project": {
+    "spec": {
+      "name": "Atlas integration example",
+      "region": "us-central",
+      "description": "Demonstration integration of an Atlas MongoDB database with a Payload application on Northflank",
+      "color": "#2B664C"
+    }
+  },
+  "concurrencyPolicy": "allow",
+  "argumentOverrides": {
+    "PAYLOAD_SECRET": "${fn.randomSecret(32)}",
+    "ATLAS_CONNECTION_STRING": "mongodb+srv://<username>:<password>@<host>/?retryWrites=true&w=majority"
+  },
+  "options": {
+    "autorun": false
+  }
+}
